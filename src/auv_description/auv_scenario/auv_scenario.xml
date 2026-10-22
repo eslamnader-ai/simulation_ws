@@ -1,0 +1,260 @@
+<?xml version="1.0"?>
+<!-- ===================================================================
+     Stonefish scenario: AUV in open water above a flat seabed.
+     Conventions: SI units, NED-style world frame (+Z down, larger z = deeper).
+     v10: + DVL, pressure, 1D sonar, ZED. v9: T5-T8 all set from SolidWorks (T5, T6 measured; T7, T8 mirrored in SW X). 4 diagonal horizontal thrusters (T1 to T4, unchanged) plus
+         4 vertical thrusters (T5 to T8) in the four corner holes of the top plate.
+     =================================================================== -->
+<scenario>
+
+    <environment>
+        <ned latitude="30.0" longitude="31.0"/>
+        <sun azimuth="0.0" elevation="45.0"/>
+        <ocean>
+            <!-- Keep 0.0: any wave height crashes the shaders on your GPU. -->
+            <waves height="0.0"/>
+            <particles enabled="true"/>
+            <current type="uniform">
+                <velocity xyz="0.0 0.0 0.0"/>
+            </current>
+        </ocean>
+    </environment>
+
+    <materials>
+        <material name="Rock" density="3000.0" restitution="0.1"/>
+        <material name="Fiberglass" density="1500.0" restitution="0.3"/>
+        <friction_table>
+            <friction material1="Rock" material2="Rock" static="0.9" dynamic="0.7"/>
+            <friction material1="Fiberglass" material2="Rock" static="0.6" dynamic="0.4"/>
+            <friction material1="Fiberglass" material2="Fiberglass" static="0.5" dynamic="0.2"/>
+        </friction_table>
+    </materials>
+
+    <looks>
+        <look name="seabed" gray="0.7" roughness="0.9"/>
+        <look name="hull_look" rgb="0.0 0.4 0.8" roughness="0.3" metallic="0.2"/>
+        <look name="propeller_look" gray="0.1" roughness="0.5" metallic="0.5"/>
+    </looks>
+
+    <static name="Bottom" type="plane">
+        <material name="Rock"/>
+        <look name="seabed"/>
+        <world_transform xyz="0.0 0.0 10.0" rpy="0.0 0.0 0.0"/>
+    </static>
+                   <!-- Start of the Auv file -->
+    <robot name="AUV" fixed="false" self_collisions="false">
+
+        <base_link name="Vehicle" type="compound" physics="submerged">
+
+            <external_part name="Hull" type="model" physics="submerged" buoyant="true">
+                <physical>
+                    <mesh filename="auv_hull_phys.obj" scale="1"/>
+                    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+                </physical>
+
+                <visual>
+                    <mesh filename="auv_hull.obj" scale="1"/>
+                    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+                </visual>
+
+                <material name="Fiberglass"/>
+
+                <mass value="156"/>
+                <inertia xyz="3.928474 3.860717 1.164208" />
+               <!-- <cg xyz="0.00281 -0.00154 -0.3092" rpy="0 0 0"/> -->
+                
+                <look name="hull_look"/>
+                <compound_transform xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            </external_part>
+        </base_link>
+
+        <!-- ================= THRUSTERS ================= -->
+        <actuator name="ThrusterT1" type="thruster">
+            <specs max_setpoint="100.0" inverted_setpoint="false" normalized_setpoint="true"/>
+            <propeller diameter="0.1" right="true">
+                <mesh filename="thruster_rotor.obj" scale="1.0"/>
+                <material name="Fiberglass"/>
+                <look name="propeller_look"/>
+            </propeller>
+            <rotor_dynamics type="first_order">
+                <time_constant value="0.1"/>
+            </rotor_dynamics>
+            <thrust_model type="fluid_dynamics">
+                <thrust_coeff forward="0.88" reverse="0.88"/>
+                <torque_coeff value="0.05"/>
+            </thrust_model>
+            <origin xyz="0.25371 0.22129 0.02274" rpy="0.0 0.0 -0.7854"/>
+            <link name="Vehicle"/>
+        </actuator> 
+
+        <actuator name="ThrusterT2" type="thruster">
+            <specs max_setpoint="100.0" inverted_setpoint="false" normalized_setpoint="true"/>
+            <propeller diameter="0.1" right="false">
+                <mesh filename="thruster_rotor.obj" scale="1.0"/>
+                <material name="Fiberglass"/>
+                <look name="propeller_look"/>
+            </propeller>
+            <rotor_dynamics type="first_order">
+                <time_constant value="0.1"/>
+            </rotor_dynamics>
+            <thrust_model type="fluid_dynamics">
+                <thrust_coeff forward="0.88" reverse="0.88"/>
+                <torque_coeff value="0.05"/>
+            </thrust_model>
+            <origin xyz="0.25371 -0.22129 0.02274" rpy="0.0 0.0 0.7854"/>
+            <link name="Vehicle"/>
+        </actuator>
+
+        <actuator name="ThrusterT3" type="thruster">
+            <specs max_setpoint="100.0" inverted_setpoint="false" normalized_setpoint="true"/>
+            <propeller diameter="0.1" right="true">
+                <mesh filename="thruster_rotor.obj" scale="1.0"/>
+                <material name="Fiberglass"/>
+                <look name="propeller_look"/>
+            </propeller>
+            <rotor_dynamics type="first_order">
+                <time_constant value="0.1"/>
+            </rotor_dynamics>
+            <thrust_model type="fluid_dynamics">
+                <thrust_coeff forward="0.88" reverse="0.88"/>
+                <torque_coeff value="0.05"/>
+            </thrust_model>
+            <origin xyz="-0.24629 0.22871 0.02274" rpy="0.0 0.0 3.92699"/>
+            <link name="Vehicle"/>
+        </actuator>
+
+        <actuator name="ThrusterT4" type="thruster">
+            <specs max_setpoint="100.0" inverted_setpoint="false" normalized_setpoint="true"/>
+            <propeller diameter="0.1" right="false">
+                <mesh filename="thruster_rotor.obj" scale="1.0"/>
+                <material name="Fiberglass"/>
+                <look name="propeller_look"/>
+            </propeller>
+            <rotor_dynamics type="first_order">
+                <time_constant value="0.1"/>
+            </rotor_dynamics>
+            <thrust_model type="fluid_dynamics">
+                <thrust_coeff forward="0.88" reverse="0.88"/>
+                <torque_coeff value="0.05"/>
+            </thrust_model>
+            <origin xyz="-0.24629 -0.22871 0.02274" rpy="0.0 0.0 -3.92699"/>
+            <link name="Vehicle"/>
+        </actuator>
+
+        <actuator name="ThrusterT5" type="thruster">
+            <specs max_setpoint="100.0" inverted_setpoint="false" normalized_setpoint="true"/>
+            <propeller diameter="0.1" right="true">
+                <mesh filename="thruster_rotor.obj" scale="1.0"/>
+                <material name="Fiberglass"/>
+                <look name="propeller_look"/>
+            </propeller>
+            <rotor_dynamics type="first_order">
+                <time_constant value="0.1"/>
+            </rotor_dynamics>
+            <thrust_model type="fluid_dynamics">
+                <thrust_coeff forward="0.88" reverse="0.88"/>
+                <torque_coeff value="0.05"/>
+            </thrust_model>
+            <origin xyz="0.1430 0.1945 -0.0565130" rpy="0.0 -1.5708 0.0"/>
+            <link name="Vehicle"/>
+        </actuator>
+
+        <actuator name="ThrusterT6" type="thruster">
+            <specs max_setpoint="100.0" inverted_setpoint="false" normalized_setpoint="true"/>
+            <propeller diameter="0.1" right="false">
+                <mesh filename="thruster_rotor.obj" scale="1.0"/>
+                <material name="Fiberglass"/>
+                <look name="propeller_look"/>
+            </propeller>
+            <rotor_dynamics type="first_order">
+                <time_constant value="0.1"/>
+            </rotor_dynamics>
+            <thrust_model type="fluid_dynamics">
+                <thrust_coeff forward="0.88" reverse="0.88"/>
+                <torque_coeff value="0.05"/>
+            </thrust_model>
+            <origin xyz="0.143 -0.1945 -0.0565130" rpy="0.0 1.5708 0.0"/>
+            <link name="Vehicle"/>
+        </actuator>
+
+        <actuator name="ThrusterT7" type="thruster">
+            <specs max_setpoint="100.0" inverted_setpoint="false" normalized_setpoint="true"/>
+            <propeller diameter="0.1" right="true">
+                <mesh filename="thruster_rotor.obj" scale="1.0"/>
+                <material name="Fiberglass"/>
+                <look name="propeller_look"/>
+            </propeller>
+            <rotor_dynamics type="first_order">
+                <time_constant value="0.1"/>
+            </rotor_dynamics>
+            <thrust_model type="fluid_dynamics">
+                <thrust_coeff forward="0.88" reverse="0.88"/>
+                <torque_coeff value="0.05"/>
+            </thrust_model>
+            <origin xyz="-0.143 -0.1945 -0.0565130" rpy="0.0 -1.5708 0.0"/>
+            <link name="Vehicle"/>
+        </actuator>
+
+        <actuator name="ThrusterT8" type="thruster">
+            <specs max_setpoint="100.0" inverted_setpoint="false" normalized_setpoint="true"/>
+            <propeller diameter="0.1" right="false">
+                <mesh filename="thruster_rotor.obj" scale="1.0"/>
+                <material name="Fiberglass"/>
+                <look name="propeller_look"/>
+            </propeller>
+            <rotor_dynamics type="first_order">
+                <time_constant value="0.1"/>
+            </rotor_dynamics>
+            <thrust_model type="fluid_dynamics">
+                <thrust_coeff forward="0.88" reverse="0.88"/>
+                <torque_coeff value="0.05"/>
+            </thrust_model>
+            <origin xyz="-0.143 0.1945 -0.0565130" rpy="0.0 1.5708 0.0"/>
+            <link name="Vehicle"/>
+        </actuator>
+
+        <!-- ================= IMU ================= -->
+        <sensor name="IMU" rate="50.0" type="imu">
+            <range angular_velocity="10.0 10.0 10.0" linear_acceleration="20.0"/>
+            <noise angle="0.001 0.001 0.001" angular_velocity="0.0001" yaw_drift="0.0001" linear_acceleration="0.001"/>
+            <history samples="1"/>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <link name="Vehicle"/>
+            <ros_publisher topic="/auv/imu"/>
+        </sensor>
+
+        <!-- ================= NEW SENSORS ================= -->
+        <sensor name="DVL" rate="5.0" type="dvl">
+            <specs beam_angle="30.0"/>
+            <range velocity="3.0 3.0 1.0" altitude_min="0.5" altitude_max="50.0"/>
+            <noise velocity="0.0015" altitude="0.001"/>
+            <history samples="1"/>
+            <origin xyz="-0.19 0.19 0.45" rpy="0.0 0.0 0.0"/>
+            <link name="Vehicle"/>
+            <ros_publisher topic="/auv/dvl"/>
+        </sensor>
+
+        <sensor name="Pressure" rate="10.0" type="pressure">
+            <range pressure="1000000.0"/>
+            <noise pressure="10.0"/>
+            <history samples="1"/>
+            <origin xyz="-0.19 0.19 0.20" rpy="0.0 0.0 0.0"/>
+            <link name="Vehicle"/>
+            <ros_publisher topic="/auv/pressure"/>
+        </sensor>
+
+        <sensor name="FLS" rate="10.0" type="fls">
+            <specs beams="512" bins="500" horizontal_fov="120.0" vertical_fov="120.0" output_format="uint8"/>
+            <settings range_min="0.5" range_max="10.0" gain="1.1"/>
+            <noise multiplicative="0.01" additive="0.02"/>
+            <display colormap="perula"/>
+            <origin xyz="0.35 0.0 -0.10" rpy="0.0 1.5708 0.0"/>
+            <link name="Vehicle"/>
+            <ros_publisher topic="/auv/display"/>
+        </sensor>
+
+        <ros_subscriber thrusters="/auv/thruster_setpoints"/>
+
+        <world_transform xyz="0.0 0.0 2.0" rpy="0.0 0.0 0.0"/>
+    </robot>
+</scenario>
